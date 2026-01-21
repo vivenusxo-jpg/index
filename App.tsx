@@ -58,10 +58,10 @@ const App: React.FC = () => {
       setLoadProgress(0);
       interval = setInterval(() => {
         setLoadProgress(prev => {
-          if (prev >= 90) return prev;
-          return prev + Math.random() * 15;
+          if (prev >= 95) return prev;
+          return prev + Math.random() * 8;
         });
-      }, 400);
+      }, 300);
     } else {
       setLoadProgress(100);
       const timeout = setTimeout(() => setLoadProgress(0), 1000);
@@ -247,12 +247,12 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen transition-all duration-700 pb-48 font-['Quicksand']" style={{ background: activeTheme.bg }}>
       
-      {/* Longitudinal Reload Bar (Vertical Progress Bar on Left) */}
+      {/* Longitudinal Reload Bar (Vertical Progress Bar on far Left edge) */}
       <div 
-        className={`fixed left-0 top-0 bottom-0 w-2.5 z-[150] bg-pink-50/20 backdrop-blur-sm transition-opacity duration-500 ${loading || loadProgress > 0 ? 'opacity-100' : 'opacity-0'}`}
+        className={`fixed left-0 top-0 bottom-0 w-1.5 z-[150] bg-pink-50/10 backdrop-blur-sm transition-opacity duration-500 ${loading || loadProgress > 0 ? 'opacity-100' : 'opacity-0'}`}
       >
         <div 
-          className="absolute bottom-0 left-0 right-0 bg-pink-500 transition-all duration-500 rounded-tr-full shadow-[0_0_15px_rgba(236,72,153,0.5)]"
+          className="absolute bottom-0 left-0 right-0 bg-pink-500 transition-all duration-300 rounded-tr-full shadow-[0_0_12px_rgba(236,72,153,0.4)]"
           style={{ height: `${loadProgress}%` }}
         />
       </div>
@@ -559,41 +559,40 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Control Bar Hub (Redesigned) */}
-      <div className={`fixed bottom-12 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-3xl border-4 border-white px-12 py-8 rounded-[5rem] shadow-[0_64px_128px_-32px_rgba(255,100,100,0.3)] flex items-center gap-12 z-[100] transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] ${isFocusMode ? 'translate-y-[300%]' : 'translate-y-0'}`}>
+      {/* Control Bar Hub (Redesigned with small reload on left) */}
+      <div className={`fixed bottom-12 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-3xl border-4 border-white px-10 py-6 rounded-[5rem] shadow-[0_64px_128px_-32px_rgba(255,100,100,0.3)] flex items-center gap-10 z-[100] transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] ${isFocusMode ? 'translate-y-[300%]' : 'translate-y-0'}`}>
         
         {/* Reload Button (Smaller, Left Side) */}
         <button 
           onClick={generateDailyPlan} 
           disabled={loading}
-          className={`w-16 h-16 rounded-[1.8rem] flex items-center justify-center transition-all duration-500 shadow-lg border-2 border-white group relative overflow-hidden ${loading ? 'bg-pink-100 scale-90' : 'bg-pink-500 hover:bg-pink-600 shadow-pink-100'}`}
+          className={`w-14 h-14 rounded-[1.6rem] flex items-center justify-center transition-all duration-500 shadow-lg border-2 border-white group relative overflow-hidden ${loading ? 'bg-pink-100' : 'bg-pink-500 hover:bg-pink-600'}`}
         >
           {loading ? (
-            <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-7 h-7 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
           ) : (
-            <>
-              <svg className={`w-8 h-8 text-white transition-transform duration-700 group-hover:rotate-180`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </>
+            <svg className="w-7 h-7 text-white transition-transform duration-700 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
           )}
-          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+          <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
         </button>
 
-        {/* Separator Line */}
-        <div className="w-1 h-10 bg-gray-100 rounded-full"></div>
+        {/* Subtle Separator */}
+        <div className="w-0.5 h-8 bg-gray-100/60 rounded-full"></div>
 
-        {/* Home / Plan Button */}
-        <button className="flex flex-col items-center gap-1 group">
-          <span className="text-4xl transition-all group-hover:-translate-y-2 group-hover:rotate-6">🏠</span>
-          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-pink-500 transition-colors">Plan</span>
-        </button>
-        
-        {/* Mastery Button */}
-        <button className="flex flex-col items-center gap-1 group">
-          <span className="text-4xl transition-all group-hover:-translate-y-2 group-hover:-rotate-6">🏆</span>
-          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-pink-500 transition-colors">Mastery</span>
-        </button>
+        {/* Nav Items */}
+        <div className="flex items-center gap-10">
+          <button className="flex flex-col items-center gap-1 group">
+            <span className="text-3xl transition-all group-hover:-translate-y-1.5 group-hover:rotate-6">🏠</span>
+            <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest group-hover:text-pink-500 transition-colors">Plan</span>
+          </button>
+          
+          <button className="flex flex-col items-center gap-1 group">
+            <span className="text-3xl transition-all group-hover:-translate-y-1.5 group-hover:-rotate-6">🏆</span>
+            <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest group-hover:text-pink-500 transition-colors">Mastery</span>
+          </button>
+        </div>
 
       </div>
 
