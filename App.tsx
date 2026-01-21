@@ -5,7 +5,7 @@ import { ICONS, THEMES } from './constants';
 import { generatePeachySchedule } from './services/geminiService';
 import PomodoroTimer from './components/PomodoroTimer';
 
-// Fix: Added missing PeachTree component for syllabus mastery visualization
+// PeachTree component for syllabus mastery visualization
 const PeachTree: React.FC<{ progress: number }> = ({ progress }) => {
   const isGrown = progress >= 100;
   const isGrowing = progress > 30;
@@ -40,6 +40,7 @@ const App: React.FC = () => {
 
   const [scheduleData, setScheduleData] = useState<GenerationResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [reflection, setReflection] = useState('');
   const [mood, setMood] = useState<Mood>('productive');
   const [waterCount, setWaterCount] = useState(0);
@@ -49,6 +50,25 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('index_profile_v5', JSON.stringify(profile));
   }, [profile]);
+
+  // Simulated progress for the longitudinal reload bar
+  useEffect(() => {
+    let interval: any;
+    if (loading) {
+      setLoadProgress(0);
+      interval = setInterval(() => {
+        setLoadProgress(prev => {
+          if (prev >= 90) return prev;
+          return prev + Math.random() * 15;
+        });
+      }, 400);
+    } else {
+      setLoadProgress(100);
+      const timeout = setTimeout(() => setLoadProgress(0), 1000);
+      return () => clearTimeout(timeout);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
 
   const handleOnboardingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,9 +232,11 @@ const App: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-[#FF4D6D] hover:bg-[#FF5E78] text-white font-black py-6 rounded-[3rem] shadow-[0_20px_40px_-10px_rgba(255,77,109,0.4)] transition-all active:scale-[0.97] text-xl uppercase tracking-[0.3em] mt-4 border-b-8 border-[#C53030]"
+              disabled={loading}
+              className="w-full bg-[#FF4D6D] hover:bg-[#FF5E78] text-white font-black py-6 rounded-[3rem] shadow-[0_20px_40px_-10px_rgba(255,77,109,0.4)] transition-all active:scale-[0.97] text-xl uppercase tracking-[0.3em] mt-4 border-b-8 border-[#C53030] flex items-center justify-center gap-3"
             >
-              GENERATE MASTERPLAN 🍓
+              {loading && <div className="w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin"></div>}
+              {loading ? 'CALCULATING...' : 'GENERATE MASTERPLAN 🍓'}
             </button>
           </form>
         </div>
@@ -224,6 +246,17 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen transition-all duration-700 pb-48 font-['Quicksand']" style={{ background: activeTheme.bg }}>
+      
+      {/* Longitudinal Reload Bar (Vertical Progress Bar on Left) */}
+      <div 
+        className={`fixed left-0 top-0 bottom-0 w-2.5 z-[150] bg-pink-50/20 backdrop-blur-sm transition-opacity duration-500 ${loading || loadProgress > 0 ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <div 
+          className="absolute bottom-0 left-0 right-0 bg-pink-500 transition-all duration-500 rounded-tr-full shadow-[0_0_15px_rgba(236,72,153,0.5)]"
+          style={{ height: `${loadProgress}%` }}
+        />
+      </div>
+
       {/* Focus Mode Overlay */}
       {isFocusMode && (
         <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-[#0F0F0F]/95 backdrop-blur-3xl p-8 animate-in fade-in duration-1000">
@@ -307,17 +340,8 @@ const App: React.FC = () => {
       <main className={`max-w-7xl mx-auto px-12 mt-16 lg:grid lg:grid-cols-12 gap-16 transition-all duration-700 ${isFocusMode ? 'opacity-0 scale-95 blur-3xl pointer-events-none' : 'opacity-100 scale-100'}`}>
         
         {/* LEFT: TIMELINE & TASKS */}
-        <div className="lg:col-span-8 space-y-16">
-          {loading ? (
-            <div className="bg-white rounded-[5rem] p-48 flex flex-col items-center justify-center text-center shadow-2xl border-b-[20px] border-[#FFF0F0]">
-              <div className="relative mb-14">
-                <div className="w-44 h-44 border-[16px] border-pink-50 border-t-[#FF4D6D] rounded-full animate-spin"></div>
-                <div className="absolute inset-0 flex items-center justify-center text-8xl animate-pulse">🍓</div>
-              </div>
-              <h3 className="text-6xl font-black text-gray-800 tracking-tighter">Harvesting Focus...</h3>
-              <p className="text-gray-400 font-black mt-6 max-w-sm mx-auto uppercase text-xs tracking-[0.4em] leading-loose opacity-60">Peachy is allocating time based on strength ratings and the 25/5 cycle.</p>
-            </div>
-          ) : scheduleData ? (
+        <div className="lg:col-span-8 space-y-16 relative">
+          {scheduleData ? (
             <>
               {/* Daily Strategy Card */}
               <div className="bg-white rounded-[4.5rem] p-12 shadow-2xl border-4 border-white flex flex-col md:flex-row gap-12 relative overflow-hidden group">
@@ -435,7 +459,7 @@ const App: React.FC = () => {
               </div>
             </>
           ) : (
-             <div className="bg-white rounded-[6rem] p-48 text-center shadow-2xl border-4 border-dashed border-pink-100 group">
+             <div className="bg-white rounded-[6rem] p-48 text-center shadow-2xl border-4 border-dashed border-pink-100 group relative">
                <span className="text-[12rem] mb-12 block animate-bounce-slow grayscale group-hover:grayscale-0 transition-all">🍓</span>
                <h3 className="text-4xl font-black text-gray-300 uppercase tracking-[0.5em] mb-12">Orchard Sleeping...</h3>
                <button onClick={generateDailyPlan} className="bg-[#FF4D6D] text-white px-20 py-8 rounded-[4rem] font-black shadow-[0_30px_60px_-15px_rgba(255,77,109,0.5)] hover:bg-[#FF5E78] transition-all uppercase tracking-[0.4em] text-2xl active:scale-95 border-b-[10px] border-[#C53030]">
@@ -498,12 +522,6 @@ const App: React.FC = () => {
                   </div>
                 );
               })}
-              {profile.subjects.length === 0 && (
-                <div className="text-center py-10 opacity-30 grayscale cursor-default">
-                  <span className="text-8xl mb-6 block">🍓</span>
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">No subjects planted yet.</p>
-                </div>
-              )}
             </div>
           </div>
 
@@ -541,29 +559,42 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Control Bar Hub */}
-      <div className={`fixed bottom-12 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-3xl border-4 border-white px-24 py-12 rounded-[7rem] shadow-[0_64px_128px_-32px_rgba(255,100,100,0.4)] flex items-center gap-32 z-[100] transition-all duration-500 hover:scale-105 active:scale-[0.98] ${isFocusMode ? 'translate-y-[300%]' : 'translate-y-0'}`}>
-        <button className="flex flex-col items-center gap-5 group">
-          <span className="text-6xl transition-all group-hover:-translate-y-5 group-hover:rotate-6">🏠</span>
-          <span className="text-[13px] font-black text-gray-300 uppercase tracking-[0.5em] group-hover:text-pink-500">Plan</span>
+      {/* Control Bar Hub (Redesigned) */}
+      <div className={`fixed bottom-12 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-3xl border-4 border-white px-12 py-8 rounded-[5rem] shadow-[0_64px_128px_-32px_rgba(255,100,100,0.3)] flex items-center gap-12 z-[100] transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] ${isFocusMode ? 'translate-y-[300%]' : 'translate-y-0'}`}>
+        
+        {/* Reload Button (Smaller, Left Side) */}
+        <button 
+          onClick={generateDailyPlan} 
+          disabled={loading}
+          className={`w-16 h-16 rounded-[1.8rem] flex items-center justify-center transition-all duration-500 shadow-lg border-2 border-white group relative overflow-hidden ${loading ? 'bg-pink-100 scale-90' : 'bg-pink-500 hover:bg-pink-600 shadow-pink-100'}`}
+        >
+          {loading ? (
+            <div className="w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <>
+              <svg className={`w-8 h-8 text-white transition-transform duration-700 group-hover:rotate-180`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </>
+          )}
+          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+        </button>
+
+        {/* Separator Line */}
+        <div className="w-1 h-10 bg-gray-100 rounded-full"></div>
+
+        {/* Home / Plan Button */}
+        <button className="flex flex-col items-center gap-1 group">
+          <span className="text-4xl transition-all group-hover:-translate-y-2 group-hover:rotate-6">🏠</span>
+          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-pink-500 transition-colors">Plan</span>
         </button>
         
-        <div className="relative">
-          <div className="absolute inset-0 bg-pink-400 blur-[96px] opacity-40 animate-pulse"></div>
-          <button 
-            onClick={generateDailyPlan} 
-            className="relative bg-[#FF4D6D] w-36 h-36 rounded-full flex items-center justify-center text-white shadow-[0_40px_80px_-20px_rgba(255,77,109,0.8)] active:scale-90 transition-all hover:bg-[#FF5E78] -mt-32 border-[14px] border-white group"
-          >
-            <svg className={`w-20 h-20 transition-transform duration-1000 ${loading ? 'animate-spin' : 'group-hover:rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
-        </div>
-
-        <button className="flex flex-col items-center gap-5 group">
-          <span className="text-6xl transition-all group-hover:-translate-y-5 group-hover:-rotate-6">🏆</span>
-          <span className="text-[13px] font-black text-gray-300 uppercase tracking-[0.5em] group-hover:text-pink-500">Mastery</span>
+        {/* Mastery Button */}
+        <button className="flex flex-col items-center gap-1 group">
+          <span className="text-4xl transition-all group-hover:-translate-y-2 group-hover:-rotate-6">🏆</span>
+          <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest group-hover:text-pink-500 transition-colors">Mastery</span>
         </button>
+
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
