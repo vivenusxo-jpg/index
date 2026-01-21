@@ -1,0 +1,8 @@
+{
+  "name": " Index🍓",
+  "description": "A cute yet hardcore daily schedule generator that blends aesthetic design with high-performance study techniques like 'Eat the Frog' and Pomodoro.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
