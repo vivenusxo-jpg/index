@@ -148,6 +148,29 @@ const App: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-2">Rise & Shine</label>
+                <input
+                  required
+                  type="time"
+                  className="w-full bg-[#FAF5F5] border-4 border-transparent focus:border-pink-100 rounded-[2rem] px-6 py-4 outline-none transition-all font-black text-lg shadow-inner text-gray-700"
+                  value={profile.wakeUpTime}
+                  onChange={e => setProfile({ ...profile, wakeUpTime: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-2">Sleepy Time</label>
+                <input
+                  required
+                  type="time"
+                  className="w-full bg-[#FAF5F5] border-4 border-transparent focus:border-pink-100 rounded-[2rem] px-6 py-4 outline-none transition-all font-black text-lg shadow-inner text-gray-700"
+                  value={profile.sleepTime}
+                  onChange={e => setProfile({ ...profile, sleepTime: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-2">Study Intensity</label>
                 <select
                   className="w-full bg-[#FAF5F5] rounded-2xl px-5 py-4 font-black outline-none shadow-inner text-xs border-2 border-transparent focus:border-pink-100 transition-all appearance-none cursor-pointer"
@@ -161,13 +184,13 @@ const App: React.FC = () => {
               </div>
               <div className="space-y-2">
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-2">Theme</label>
-                <div className="flex gap-2 bg-[#FAF5F5] p-2 rounded-2xl shadow-inner">
+                <div className="flex gap-2 bg-[#FAF5F5] p-2 rounded-2xl shadow-inner h-full items-center justify-center">
                   {(Object.keys(THEMES) as Theme[]).map(t => (
                     <button
                       key={t}
                       type="button"
                       onClick={() => setProfile({ ...profile, theme: t })}
-                      className={`w-10 h-10 rounded-xl border-4 transition-all hover:scale-110 ${profile.theme === t ? 'border-gray-800 shadow-lg' : 'border-white'}`}
+                      className={`w-8 h-8 rounded-xl border-4 transition-all hover:scale-110 ${profile.theme === t ? 'border-gray-800 shadow-lg' : 'border-white'}`}
                       style={{ background: THEMES[t].accent }}
                     />
                   ))}
@@ -186,7 +209,7 @@ const App: React.FC = () => {
                   + Add Subject
                 </button>
               </div>
-              <div className="space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar pr-2">
+              <div className="space-y-3 max-h-[180px] overflow-y-auto custom-scrollbar pr-2">
                 {profile.subjects.map(sub => (
                   <div key={sub.id} className="bg-pink-50/20 p-5 rounded-[2.5rem] border-2 border-[#FFF0F0] flex flex-col gap-3 group hover:bg-white transition-all shadow-sm">
                     <div className="flex gap-4">
@@ -366,7 +389,7 @@ const App: React.FC = () => {
                       <span className="text-[10px] font-black text-green-400 uppercase tracking-widest block mb-4">Maintenance</span>
                       <div className="flex flex-wrap gap-2">
                         {scheduleData.assessment.strongSubjects.map(s => (
-                          <span key={s} className="bg-white text-green-400 px-4 py-2 rounded-full text-[10px] font-black shadow-sm border border-green-50">{s}</span>
+                          <span key={s} className="bg-white text-green-400 px-4 py-2 rounded-full text-[10px] font-black shadow-sm border border-red-50">{s}</span>
                         ))}
                       </div>
                     </div>
